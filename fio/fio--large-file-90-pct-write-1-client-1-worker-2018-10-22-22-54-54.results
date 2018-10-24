@@ -1,0 +1,46 @@
+hostname=fiotest-51, be=0, 64-bit, os=Linux, arch=x86-64, fio=fio-3.1, flags=1
+<fiotest-51> seqwrite: (g=0): rw=rw, bs=(R) 4096KiB-4096KiB, (W) 4096KiB-4096KiB, (T) 4096KiB-4096KiB, ioengine=sync, iodepth=1
+<fiotest-51> Starting 1 process
+Jobs: 1 (f=1)Jobs: 1 (f=1)Jobs: 1 (f=1): [M(1)][10.7%][r=24.6M,w=201M][r=6,w=49 IOPS][eta 00m:25s]Jobs: 1 (f=1): [M(1)][16.7%][r=28.7M,w=225M][r=7,w=55 IOPS][eta 00m:20s]Jobs: 1 (f=1): [M(1)][22.7%][r=24.6M,w=229M][r=6,w=56 IOPS][eta 00m:17s]Jobs: 1 (f=1): [M(1)][27.3%][r=20.5M,w=184M][r=5,w=45 IOPS][eta 00m:16s]Jobs: 1 (f=1): [M(1)][31.8%][r=28.7M,w=156M][r=7,w=38 IOPS][eta 00m:15s]Jobs: 1 (f=1): [M(1)][40.0%][r=25.6M,w=205M][r=6,w=50 IOPS][eta 00m:12s]Jobs: 1 (f=1): [M(1)][42.9%][r=20.5M,w=160M][r=5,w=39 IOPS][eta 00m:12s]Jobs: 1 (f=1): [M(1)][45.5%][r=16.4M,w=123M][r=4,w=30 IOPS][eta 00m:12s]Jobs: 1 (f=1): [M(1)][47.6%][r=30.7M,w=220M][r=7,w=53 IOPS][eta 00m:11s]Jobs: 1 (f=1): [M(1)][52.4%][r=16.4M,w=164M][r=4,w=40 IOPS][eta 00m:10s]Jobs: 1 (f=1): [M(1)][57.1%][r=20.5M,w=131M][r=5,w=32 IOPS][eta 00m:09s]Jobs: 1 (f=1): [M(1)][61.9%][r=16.4M,w=229M][r=4,w=56 IOPS][eta 00m:08s]Jobs: 1 (f=1): [M(1)][66.7%][r=30.7M,w=200M][r=7,w=48 IOPS][eta 00m:07s]Jobs: 1 (f=1): [M(1)][75.0%][r=28.7M,w=229M][r=7,w=56 IOPS][eta 00m:05s]Jobs: 1 (f=1): [M(1)][80.0%][r=32.8M,w=217M][r=8,w=53 IOPS][eta 00m:04s]Jobs: 1 (f=1): [M(1)][85.0%][r=8192k,w=172M][r=2,w=42 IOPS][eta 00m:03s]Jobs: 1 (f=1): [M(1)][85.7%][r=25.6M,w=133M][r=6,w=32 IOPS][eta 00m:03s]Jobs: 1 (f=1): [M(1)][95.0%][r=24.6M,w=209M][r=6,w=51 IOPS][eta 00m:01s]Jobs: 1 (f=1): [M(1)][95.2%][r=16.4M,w=160M][r=4,w=39 IOPS][eta 00m:01s]Jobs: 0 (f=0)seqwrite: (groupid=0, jobs=1): err= 0: pid=11462: Mon Oct 22 22:55:19 2018
+   read: IOPS=5, BW=22.5MiB/s (23.6MB/s)(456MiB/20228msec)
+    clat (msec): min=3, max=409, avg=36.97, stdev=56.74
+     lat (msec): min=3, max=409, avg=36.97, stdev=56.74
+    clat percentiles (msec):
+     |  1.00th=[    4],  5.00th=[    4], 10.00th=[    4], 20.00th=[    5],
+     | 30.00th=[    6], 40.00th=[   10], 50.00th=[   14], 60.00th=[   25],
+     | 70.00th=[   35], 80.00th=[   59], 90.00th=[   97], 95.00th=[  136],
+     | 99.00th=[  255], 99.50th=[  409], 99.90th=[  409], 99.95th=[  409],
+     | 99.99th=[  409]
+   bw (  KiB/s): min= 8192, max=41042, per=100.00%, avg=24360.32, stdev=8310.20, samples=37
+   iops        : min=    2, max=   10, avg= 5.95, stdev= 2.03, samples=37
+  write: IOPS=44, BW=180MiB/s (189MB/s)(3640MiB/20228msec)
+    clat (msec): min=13, max=466, avg=17.26, stdev=19.09
+     lat (msec): min=13, max=466, avg=17.58, stdev=19.09
+    clat percentiles (msec):
+     |  1.00th=[   14],  5.00th=[   14], 10.00th=[   15], 20.00th=[   15],
+     | 30.00th=[   15], 40.00th=[   15], 50.00th=[   16], 60.00th=[   16],
+     | 70.00th=[   16], 80.00th=[   17], 90.00th=[   18], 95.00th=[   20],
+     | 99.00th=[   59], 99.50th=[  101], 99.90th=[  468], 99.95th=[  468],
+     | 99.99th=[  468]
+   bw (  KiB/s): min=73728, max=246252, per=99.83%, avg=183948.12, stdev=46319.09, samples=40
+   iops        : min=   18, max=   60, avg=44.90, stdev=11.30, samples=40
+  lat (msec)   : 4=1.37%, 10=3.22%, 20=86.33%, 50=5.27%, 100=2.25%
+  lat (msec)   : 250=1.27%, 500=0.29%
+  cpu          : usr=1.47%, sys=2.51%, ctx=1027, majf=0, minf=28
+  IO depths    : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     issued rwt: total=114,910,0, short=0,0,0, dropped=0,0,0
+     latency   : target=0, window=0, percentile=100.00%, depth=1
+
+Run status group 0 (all jobs):
+   READ: bw=22.5MiB/s (23.6MB/s), 22.5MiB/s-22.5MiB/s (23.6MB/s-23.6MB/s), io=456MiB (478MB), run=20228-20228msec
+  WRITE: bw=180MiB/s (189MB/s), 180MiB/s-180MiB/s (189MB/s-189MB/s), io=3640MiB (3817MB), run=20228-20228msec
+
+Disk stats (read/write):
+  sda: ios=1026/8144, merge=0/0, ticks=10754/85439, in_queue=96144, util=97.07%
+<fiotest-51> 
+
+Iteration 1 write total throughtput = 184320
+Iteration 1 read total throughtput = 23040.0
+

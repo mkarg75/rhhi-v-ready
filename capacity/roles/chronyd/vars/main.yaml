@@ -1,0 +1,3 @@
+required_repos:
+  - rhel-7-server-rpms
+enable_rh_repos: true

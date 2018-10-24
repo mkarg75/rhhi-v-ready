@@ -1,0 +1,54 @@
+- hosts: basic
+  gather_facts: no
+
+  vars:
+
+  tasks:
+    - name: Add the rhhi package repositoy
+      yum_repository:
+         name: rhhi-repo
+         description: RHHI V Ready repository
+         baseurl: http://rhhi-ansible1.lab.eng.blr.redhat.com/rhhi-repo/
+         state: present
+         enabled: yes
+         gpgcheck: no
+
+    - name: yum-clean-metadata
+      command: yum clean metadata
+      args:
+        warn: no
+
+    - name: Install fio and iperf3
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+         - fio
+         - iperf3
+         - bc
+
+    - name: Open the port for fio
+      firewalld:
+        zone: public
+        port: 8765/tcp
+        permanent: true
+        state: enabled
+
+    - name: Open tcp ports for iperf3
+      firewalld:
+        zone: public
+        port: 5200-5300/tcp
+        permanent: true
+        state: enabled
+
+    - name: Open udp ports for iperf3
+      firewalld:
+        zone: public
+        port: 5200-5300/udp
+        permanent: true
+        state: enabled
+
+    - name: Start a fio server process
+      shell: nohup fio < dev/null > /dev/null 2>&1 &
+
+

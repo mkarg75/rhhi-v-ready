@@ -1,0 +1,17 @@
+- hosts: all
+  gather_facts: no
+
+  vars:
+
+  tasks:
+    - name: Add a blacklist to multipath.conf
+      template: 
+         src: multipath.j2
+         dest: /etc/multipath.conf
+         owner: root
+         group: root
+         mode: '0644'
+
+    - name: Create new initramdisk with updated multipath.conf
+      command: /usr/sbin/dracut -f
+

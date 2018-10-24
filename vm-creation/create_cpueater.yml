@@ -1,0 +1,52 @@
+---
+- name: Create cpu eater VMs
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    how_many: 1
+    template_items:
+       - cpueater25
+       - cpueater50
+       - cpueater75
+
+  tasks:
+
+  - name: Create a VM from the cpu eater template with cloud init
+    ovirt_vms:
+      auth:
+         username: admin@internal
+         password: RedHat1!
+         url: https://rhvm-cap.lab.eng.blr.redhat.com/ovirt-engine/api
+         insecure: true
+      ballooning_enabled: false
+      memory: 32Gib
+      memory_guaranteed: 32Gib
+      memory_max: 32Gib
+      clone: no
+      clone_permissions: no
+      cpu_cores: 8
+      cpu_sockets: 2
+      io_threads: 2
+      disk_format: raw
+      name: "{{ item.0 }}-{{ item.1 }}"
+      template: "{{ item.0 }}"
+      cluster: Default
+      type: server
+      state: running
+      cloud_init:
+         nic_boot_protocol: static
+         nic_ip_address: "10.70.56.{{ item.1 | int +20  }}"
+         nic_netmask: 255.255.255.0
+         nic_gateway: 10.70.56.254
+         nic_name: eth0
+         nic_on_boot: true
+         host_name: "{{ item.0 }}-{{ item.1 }}"
+         dns_search: lab.eng.blr.redhat.com
+         user_name: root
+         root_password: RedHat1!
+      cloud_init_persist: true
+    #loop: "{{ ['cpueater25', 'cpueater50', 'cpueater75']|product(range(0, how_many|int ,1))|list }}"
+    loop: "{{ ['cpueater50']|product(range(0, how_many|int ,1))|list }}"
+

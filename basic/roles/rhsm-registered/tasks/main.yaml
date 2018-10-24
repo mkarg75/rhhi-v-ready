@@ -1,0 +1,10 @@
+---
+
+
+- name: register system to CDN
+  redhat_subscription:
+    state: present
+    activationkey: hpe_poc
+    org_id: 11713174
+
+...

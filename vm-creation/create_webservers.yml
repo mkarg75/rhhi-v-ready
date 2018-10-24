@@ -1,0 +1,56 @@
+---
+- name: Create DS3 webservers
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    how_many: 1
+    template_items:
+       - cpueater25
+       - cpueater50
+       - cpueater75
+
+  tasks:
+
+  - name: Create a VM from the cpu eater template with cloud init
+    ovirt_vms:
+      auth:
+         username: admin@internal
+         password: RedHat1!
+         url: https://rhvm-cap.lab.eng.blr.redhat.com/ovirt-engine/api
+         insecure: true
+      ballooning_enabled: false
+      memory: 2GiB
+      memory_guaranteed: 2Gib
+      memory_max: 2Gib
+      clone: no
+      clone_permissions: no
+      cpu_cores: 2
+      cpu_sockets: 1
+      io_threads: 1
+      disk_format: raw
+      #name: "{{ item.0 }}-{{ item.1 }}"
+      name: "ds3-web-{{ item }}"
+      #template: "{{ item.0 }}"
+      template: ds3-web-template
+      cluster: Default
+      type: server
+      state: running
+      cloud_init:
+         nic_boot_protocol: static
+         nic_ip_address: "10.70.56.{{ item | int +30  }}"
+         nic_netmask: 255.255.255.0
+         nic_gateway: 10.70.56.254
+         nic_name: eth0
+         nic_on_boot: true
+         host_name: "ds3-web-{{ item }}"
+         dns_search: lab.eng.blr.redhat.com
+         user_name: root
+         root_password: RedHat1!
+         authorized_ssh_keys: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDn0jFD+xKth1Q0xdDGIWVaRRDCqj1cW9nB9J+YBrs40wxf5yhcHPfxajkWAcw2bHnWRBuzPwFgKDcPAWxX0ZczAekL+4AzGpdgyAF5hqRdYhV5cE6kQduGhUbO8gfnbzs5yy+r/UHXV4K+NdmgMRimc6FXgjQsBRsqYjF7bzR6soGZqpILEoUJP85ufiBBpO1hCf4XObrqzIa6wqAPPbGU0d5h182fSCacrY0WSoJ4X4lLqLbTuY1Ye3m4pI/0LQyqzexzWizUdd1a42isvm/fO38TGaR7natgD5/6fwYWvBD8DHdKTCVubcPJbLba/Yv6Ky6U8FsWhisQJQmUKiP7 root@rhhi-ansible1.lab.eng.blr.redhat.com"
+      cloud_init_persist: true
+    #loop: "{{ ['cpueater25', 'cpueater50', 'cpueater75']|product(range(0, how_many|int ,1))|list }}"
+    #loop: "{{ ['cpueater50']|product(range(0, how_many|int ,1))|list }}"
+    loop: "{{ range(0, how_many|int)|list }}" 
+

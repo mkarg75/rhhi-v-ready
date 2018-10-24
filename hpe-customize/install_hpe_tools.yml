@@ -1,0 +1,33 @@
+- hosts: basic
+  gather_facts: no
+
+  tasks:
+    - name: Add HPE STK repo, disable by default
+      yum_repository:
+        name: hpe-stk
+        baseurl: http://downloads.linux.hpe.com/repo/stk/rhel/7.4/$basearch/current
+        description: HPE Scripting Tools
+        gpgcheck: no
+        enabled: no
+        state: present
+
+    - name: Install HPE Scripting Tools
+      yum:
+        name: hp-scripting-tools
+        state: present
+        enablerepo: hpe-stk
+
+    - name: Add HPE SPP repo, disable by default
+      yum_repository:
+        name: hpe-spp
+        baseurl: http://downloads.linux.hpe.com/SDR/repo/spp/redhat/7Server/$basearch/current
+        description: HPE ServicePack for Proliant
+        gpgcheck: no
+        enabled: no
+        state: present
+
+    - name: Install HPE SmartArray CLI
+      yum:
+        name: hpssacli
+        state: present
+        enablerepo: hpe-spp

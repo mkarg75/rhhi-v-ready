@@ -1,0 +1,46 @@
+- hosts: all
+  gather_facts: no
+
+  vars:
+    prom_server: 34.233.15.254
+    push_gw_port: 9091
+    #FIXME
+    ne_path: /node_exporter/node_exporter-0.16.0.linux-amd64
+    #FIXME - moved the job name into a group variable in the inventory file
+    #job_name: rhhi-v-lab-basic
+
+  tasks:
+    - name: Create node_exporter directory
+      file:
+        path: /node_exporter
+        state: directory
+
+    # should fix this to download latest
+    - name: Download and extract node_exporter
+      unarchive: 
+        src: https://github.com/prometheus/node_exporter/releases/download/v0.16.0/node_exporter-0.16.0.linux-amd64.tar.gz
+        dest: /node_exporter
+        remote_src: yes
+
+    - name: Create systemd service for node_exporter
+      template:
+        src: node_exporter.service.j2
+        dest: /etc/systemd/system/node_exporter.service
+
+    - name: Create systemd service to push metrics
+      template:
+        src: prometheus_push.service.j2
+        dest: /etc/systemd/system/prometheus_push.service
+
+    - name: Reload systemd
+      systemd:
+        daemon_reload: yes
+
+    - name: Enable and start services
+      systemd:
+        enabled: yes
+        state: restarted
+        name: "{{ item }}"
+      with_items:
+        - node_exporter
+        - prometheus_push

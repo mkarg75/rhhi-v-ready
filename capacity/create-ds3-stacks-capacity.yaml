@@ -1,0 +1,106 @@
+- name: Create DS3 database and web server VMs
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    how_many: 1
+    engine_url: https://rhvm-cap.lab.eng.blr.redhat.com/ovirt-engine/api
+    engine_user: admin@internal
+    engine_password: RedHat1!
+
+    db_vm_tag: ds-mysql
+    db_ds3_vm_tag: ds3-mysql-10gb
+    web_ds3_vm_tag: ds3-web
+
+    ds3_db_vm:
+      name: "ds3-mysql-{{ item }}"
+      tag: "{{ db_ds3_vm_tag }}"
+      profile:
+        state: running
+        cluster: Default
+        template: ds3-mysql-capacity-template
+        clone: no
+        memory: 16GiB
+        memory_max: 16GiB
+        memory_guaranteed: 16GiB
+        cores: 4
+        ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDn0jFD+xKth1Q0xdDGIWVaRRDCqj1cW9nB9J+YBrs40wxf5yhcHPfxajkWAcw2bHnWRBuzPwFgKDcPAWxX0ZczAekL+4AzGpdgyAF5hqRdYhV5cE6kQduGhUbO8gfnbzs5yy+r/UHXV4K+NdmgMRimc6FXgjQsBRsqYjF7bzR6soGZqpILEoUJP85ufiBBpO1hCf4XObrqzIa6wqAPPbGU0d5h182fSCacrY0WSoJ4X4lLqLbTuY1Ye3m4pI/0LQyqzexzWizUdd1a42isvm/fO38TGaR7natgD5/6fwYWvBD8DHdKTCVubcPJbLba/Yv6Ky6U8FsWhisQJQmUKiP7 root@rhhi-ansible1.lab.eng.blr.redhat.com 
+        cloud_init:
+          - nic_ip_address: "10.70.56.{{ item }}"
+          - nic_gateway: 10.70.56.254
+          - nic_netmask: 255.255.255.0
+          - nic_on_boot: true
+          - nic_name: eth0
+          - nic_boot_protocol: static
+          - host_name: "ds3-mysql-{{ item }}"
+          - root_password: RedHat1!
+          - dns_servers: 10.70.34.1
+          - dns_search: lab.eng.blr.redhat.com
+          - user_name: root
+
+    ds3_web_vm:
+      name: "ds3-web-{{ item }}"
+      tag: "{{ web_ds3_vm_tag }}"
+      profile:
+        state: running
+        cluster: Default
+        template: ds3-web-capacity-template
+        clone: no
+        memory: 2GiB
+        cores: 2
+        ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDn0jFD+xKth1Q0xdDGIWVaRRDCqj1cW9nB9J+YBrs40wxf5yhcHPfxajkWAcw2bHnWRBuzPwFgKDcPAWxX0ZczAekL+4AzGpdgyAF5hqRdYhV5cE6kQduGhUbO8gfnbzs5yy+r/UHXV4K+NdmgMRimc6FXgjQsBRsqYjF7bzR6soGZqpILEoUJP85ufiBBpO1hCf4XObrqzIa6wqAPPbGU0d5h182fSCacrY0WSoJ4X4lLqLbTuY1Ye3m4pI/0LQyqzexzWizUdd1a42isvm/fO38TGaR7natgD5/6fwYWvBD8DHdKTCVubcPJbLba/Yv6Ky6U8FsWhisQJQmUKiP7 root@rhhi-ansible1.lab.eng.blr.redhat.com 
+        cloud_init:
+          - nic_ip_address: "10.70.56.{{ item }}"
+          - nic_gateway: 10.70.56.254
+          - nic_netmask: 255.255.255.0
+          - nic_on_boot: true
+          - nic_name: eth0
+          - nic_boot_protocol: static
+          - host_name: "ds3-web-{{ item }}"
+          - root_password: RedHat1!
+          - dns_servers: 10.70.34.1
+          - dns_search: lab.eng.blr.redhat.com
+          - user_name: root
+
+  tasks:
+
+          #- include_vars: credentials/ovirt-credentials.yaml
+
+    - assert:
+        that:
+          - how_many is defined
+          - engine_url is defined
+          - engine_user is defined
+          - engine_password is defined
+
+    - ovirt_auth:
+        url: "{{ engine_url }}"
+        username: "{{ engine_user }}"
+        password: "{{ engine_password }}"
+
+    - set_fact:
+        ds3_db_vms: "{{ (ds3_db_vms | default([])) + [ds3_db_vm] }}"
+      with_sequence: "start=132 count={{ how_many }}"
+
+    - name: Create DS3 database VMs
+      include_role: name=ovirt-ansible-vm-infra
+      vars:
+        vms: "{{ ds3_db_vms }}"
+
+      #- debug: var=ds3_db_vms
+
+    - name: Tag DS3 database VMs with {{ db_vm_tag }}
+      ovirt_tags:
+        auth: "{{ ovirt_auth }}"
+        name: "{{ db_vm_tag }}"
+        vms: "{{ ds3_db_vms | map(attribute='name') | list }}"
+
+    - set_fact:
+        ds3_web_vms: "{{ (ds3_web_vms | default([])) + [ds3_web_vm] }}"
+      with_sequence: "start=15 count={{ how_many }}"
+
+    - name: Create DS3 web server VMs
+      include_role: name=ovirt-ansible-vm-infra
+      vars:
+        vms: "{{ ds3_web_vms }}"

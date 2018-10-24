@@ -1,0 +1,14 @@
+- hosts: basic
+  gather_facts: no
+
+  vars:
+    conrep_file: /var/tmp/conrep-rhhi-v-basic.xml
+
+  tasks:
+    - name: Copy conrep hardware config file
+      copy:
+        src: conrep-rhhi-v-basic.xml
+        dest: "{{ conrep_file }}"
+
+    - name: Load conrep config file
+      command: /usr/sbin/conrep -l -f {{ conrep_file }}

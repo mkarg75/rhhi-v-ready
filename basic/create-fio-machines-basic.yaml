@@ -1,0 +1,73 @@
+- name: Create fio server VMs
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    how_many: 1
+    engine_url: https://rhvm-basic.lab.eng.blr.redhat.com/ovirt-engine/api
+    engine_user: admin@internal
+    engine_password: RedHat1!
+
+    fio_tag: fio
+
+    fio_vm:
+      name: "fio-{{ item }}"
+      tag: "{{ fio_tag }}"
+      profile:
+        state: running
+        cluster: Default
+        template: fiotest4
+        clone: no
+        memory: 16GiB
+        memory_max: 16GiB                # upper limit
+        memory_guaranteed: 16GiB         # lower limit
+        ballooning_enabled: true        # added to enable over commitment
+        cores: 4
+        ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDn0jFD+xKth1Q0xdDGIWVaRRDCqj1cW9nB9J+YBrs40wxf5yhcHPfxajkWAcw2bHnWRBuzPwFgKDcPAWxX0ZczAekL+4AzGpdgyAF5hqRdYhV5cE6kQduGhUbO8gfnbzs5yy+r/UHXV4K+NdmgMRimc6FXgjQsBRsqYjF7bzR6soGZqpILEoUJP85ufiBBpO1hCf4XObrqzIa6wqAPPbGU0d5h182fSCacrY0WSoJ4X4lLqLbTuY1Ye3m4pI/0LQyqzexzWizUdd1a42isvm/fO38TGaR7natgD5/6fwYWvBD8DHdKTCVubcPJbLba/Yv6Ky6U8FsWhisQJQmUKiP7 root@rhhi-ansible1.lab.eng.blr.redhat.com 
+        cloud_init:
+          - nic_ip_address: "10.70.56.{{ item }}"
+          - nic_gateway: 10.70.56.254
+          - nic_netmask: 255.255.255.0
+          - nic_on_boot: true
+          - nic_name: eth0
+          - nic_boot_protocol: static
+          - host_name: "fiotest-{{ item }}"
+          - root_password: RedHat1!
+          - dns_servers: 10.70.34.1
+          - dns_search: lab.eng.blr.redhat.com
+          - user_name: root
+
+  tasks:
+
+          #- include_vars: credentials/ovirt-credentials.yaml
+
+    - assert:
+        that:
+          - how_many is defined
+          - engine_url is defined
+          - engine_user is defined
+          - engine_password is defined
+
+    - ovirt_auth:
+        url: "{{ engine_url }}"
+        username: "{{ engine_user }}"
+        password: "{{ engine_password }}"
+
+    - set_fact:
+        fio_vms: "{{ (fio_vms | default([])) + [fio_vm] }}"
+      with_sequence: "start=51 count={{ how_many }}"
+
+    - name: Create fio VMs
+      include_role: name=ovirt-ansible-vm-infra
+      vars:
+        vms: "{{ fio_vms }}"
+
+      #- debug: var=ds3_db_vms
+
+    - name: Tag fio VMs with {{ db_vm_tag }}
+      ovirt_tags:
+        auth: "{{ ovirt_auth }}"
+        name: "{{ fio_tag }}"
+        vms: "{{ fio_vms | map(attribute='name') | list }}"
+

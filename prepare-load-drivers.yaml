@@ -1,0 +1,113 @@
+---
+
+- hosts: load-drivers
+
+  roles:
+    - rhsm-registered
+    #- monitoring
+    - chronyd
+
+  vars:
+    required_repos:
+      - rhel-7-server-rpms
+      - rhel-7-server-extras-rpms
+    interface: ens192  
+
+  tasks:
+
+   - name: Disable all repositories except required_repos
+     rhsm_repository:
+       name: "{{ enabled_repos.repositories |
+        map(attribute='id') |
+        difference(required_repos) |
+        join(',' ) }}"
+       state: disabled
+
+   - name: enable required repositories
+     rhsm_repository: name={{ required_repos | join(',') }}
+     state: enabled
+     register: enabled_repos
+
+   - name: enable extra repo
+     rhsm_repository: name="rhel-7-server-extras-rpms"
+     state: enabled
+
+   - name: install docker and ansible dependencies
+     yum:
+       name: docker
+       state: present
+
+   - name: install docker-python
+     yum:
+       name: docker-python
+       state: present
+
+   - name: start and enable docker
+     service:
+       name: docker
+       state: started
+       enabled: yes
+
+   - name: pull down load driver containers
+     docker_image: name={{ item }}
+     with_items:
+             #- dmesser/ds2mysqldriver
+        - dmesser/ds3webdriver
+
+   - name: install python dependencies
+     package: name={{ item }} state=present
+     with_items:
+       - MySQL-python
+
+#   - name: copy the benchmark script
+#     copy:
+#        src: files/run_bench.py
+#        dest: /root/
+#        owner: root
+#        group: root
+#        mode: 0755
+
+        #   - name: create the directory for the ds2 config files
+        #file: path=/root/ds2mysqldriver state=directory
+
+   - name: create the directory for the ds3 config files
+     file: path=/root/ds3webdriver state=directory
+
+     #   - name: Copy collectd config file
+     #template:
+     #  src: network-bandwidth-usage.conf.j2
+     #  dest: /etc/collectd.d/network-bandwidth-usage.conf
+     #  owner: root
+     #  group: root
+     #  mode: 0644
+
+- hosts: rhhi-perf1.lab.eng.blr.redhat.com
+
+  tasks:
+
+   - name: create config files for the containers
+     template:
+         src: templates/ds3DriverConfig.txt.j2
+         dest: /root/ds3webdriver/DriverConfig.txt.{{ item.0 }}
+         owner: root
+         group: root
+         mode: 0644
+     loop: "{{ range(0,75,1)|list|zip(range(15,90,1))|list }}"
+
+
+- hosts: rhhi-perf2.lab.eng.blr.redhat.com
+
+  tasks:
+
+   - name: create config files for the containers
+     template:
+         src: templates/ds3DriverConfig.txt.j2
+         dest: /root/ds3webdriver/DriverConfig.txt.{{ item.0 }}
+         owner: root
+         group: root
+         mode: 0644
+     loop: "{{ range(0,42,1)|list|zip(range(130,172,1))|list }}"
+
+
+
+

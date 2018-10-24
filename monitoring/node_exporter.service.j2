@@ -1,0 +1,12 @@
+[Unit]
+Description=Prometheus node_exporter 
+After=NetworkManager.service
+
+[Service]
+Restart=always
+ExecStart={{ ne_path }}/node_exporter
+PIDFile=/var/run/node_exporter.pid
+ExecStop=/usr/bin/kill -9 `cat /var/run/node_exporter.pid`
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,88 @@
+- name: Configure fio server instances
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    engine_url: https://rhvm-basic.lab.eng.blr.redhat.com/ovirt-engine/api
+    engine_user: admin@internal
+    engine_password: RedHat1!
+
+    fio_vm_tag: fio
+
+  tasks:
+    #- include_vars: credentials/ovirt-credentials.yaml
+
+    - assert:
+        that:
+          - engine_url is defined
+          - engine_user is defined
+          - engine_password is defined
+
+    - ovirt_auth:
+        url: "{{ engine_url }}"
+        username: "{{ engine_user }}"
+        password: "{{ engine_password }}"
+
+    - name: Get Web VMs by tag
+      ovirt_vms_facts:
+        auth: "{{ ovirt_auth }}"
+        pattern: "tag={{ fio_vm_tag }} and status = Up"
+      register: fio_vms
+
+    - debug: 
+        var: fio_vms
+
+    - name: Get fio VM NICs
+      ovirt_nics_facts:
+        auth: "{{ ovirt_auth }}"
+        vm: "{{ item }}"
+      register: fio_nics
+      loop: "{{ fio_vms.ansible_facts.ovirt_vms|json_query('[*].name') }}"
+
+    
+    - set_fact:
+        fio_ips: "{{ fio_nics.results|json_query('[].ansible_facts.ovirt_nics[].reported_devices[].ips[?version==`v4`].address | []') }}"
+
+    - debug:
+        var: fio_ips
+
+    - name: add VMs to inventory
+      add_host:
+        name: "{{ item }}"
+        groups: fio_hosts
+        ansible_ssh_user: root
+      with_items: "{{ fio_ips }}"
+      when: item | search('10.70.56')
+
+- name: Initialize fio hosts
+  hosts: fio_hosts
+  gather_facts: true
+  become: true
+
+  vars:
+    fio_vm_hostname_prefix: 
+    db_vm_hostname_prefix: 172.31.24.
+
+  tasks:
+
+    # sets the mysql default host ds3-mysql-XXX where XXX is the number extracted from the web servers hostname following the pattern ds3-web-NNN where NNN is between 1 and 128
+
+    - name: Kill any running fio servers
+      command: pkill fio
+      ignore_errors: true
+
+    - name: Unmount fiotest dir
+      mount:
+        path: /fiotest
+        state: absent
+
+    - name: Mount sda
+      mount:
+        path: /fiotest
+        src: /dev/sda
+        fstype: xfs
+        state: mounted
+
+    - name: start fio server
+      command: /usr/bin/fio --server --daemonize=/var/run/fio.pid

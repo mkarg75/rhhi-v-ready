@@ -1,0 +1,46 @@
+hostname=fiotest-51, be=0, 64-bit, os=Linux, arch=x86-64, fio=fio-3.1, flags=1
+<fiotest-51> seqwrite: (g=0): rw=rw, bs=(R) 4096KiB-4096KiB, (W) 4096KiB-4096KiB, (T) 4096KiB-4096KiB, ioengine=sync, iodepth=1
+<fiotest-51> Starting 1 process
+Jobs: 1 (f=1)Jobs: 1 (f=1)Jobs: 1 (f=1): [M(1)][13.0%][r=32.8M,w=197M][r=8,w=48 IOPS][eta 00m:20s]Jobs: 1 (f=1): [M(1)][16.0%][r=12.3M,w=111M][r=3,w=27 IOPS][eta 00m:21s]Jobs: 1 (f=1): [M(1)][19.2%][r=10.2M,w=179M][r=2,w=43 IOPS][eta 00m:21s]Jobs: 1 (f=1): [M(1)][25.0%][r=20.5M,w=193M][r=5,w=47 IOPS][eta 00m:18s]Jobs: 1 (f=1): [M(1)][29.2%][r=28.7M,w=156M][r=7,w=38 IOPS][eta 00m:17s]Jobs: 1 (f=1): [M(1)][34.8%][r=28.7M,w=176M][r=7,w=43 IOPS][eta 00m:15s]Jobs: 1 (f=1): [M(1)][39.1%][r=15.4M,w=215M][r=3,w=52 IOPS][eta 00m:14s]Jobs: 1 (f=1): [M(1)][43.5%][r=28.7M,w=152M][r=7,w=37 IOPS][eta 00m:13s]Jobs: 1 (f=1): [M(1)][50.0%][r=20.5M,w=195M][r=5,w=47 IOPS][eta 00m:11s]Jobs: 1 (f=1): [M(1)][52.2%][r=12.3M,w=106M][r=3,w=26 IOPS][eta 00m:11s]Jobs: 1 (f=1): [M(1)][56.5%][r=28.7M,w=164M][r=7,w=40 IOPS][eta 00m:10s]Jobs: 1 (f=1): [M(1)][60.9%][r=12.3M,w=156M][r=3,w=38 IOPS][eta 00m:09s]Jobs: 1 (f=1): [M(1)][62.5%][r=4096k,w=49.2M][r=1,w=12 IOPS][eta 00m:09s]Jobs: 1 (f=1): [M(1)][62.5%][r=10.2M,w=159M][r=2,w=38 IOPS][eta 00m:09s] Jobs: 1 (f=1): [M(1)][66.7%][r=28.7M,w=156M][r=7,w=38 IOPS][eta 00m:08s]Jobs: 1 (f=1): [M(1)][70.8%][r=15.4M,w=138M][r=3,w=33 IOPS][eta 00m:07s]Jobs: 1 (f=1): [M(1)][75.0%][r=12.3M,w=152M][r=3,w=37 IOPS][eta 00m:06s]Jobs: 1 (f=1): [M(1)][79.2%][r=20.5M,w=148M][r=5,w=36 IOPS][eta 00m:05s]Jobs: 1 (f=1): [M(1)][83.3%][r=20.5M,w=147M][r=5,w=36 IOPS][eta 00m:04s]Jobs: 1 (f=1): [M(1)][87.5%][r=8192k,w=147M][r=2,w=36 IOPS][eta 00m:03s]Jobs: 1 (f=1): [M(1)][88.0%][r=20.5M,w=164M][r=5,w=40 IOPS][eta 00m:03s]Jobs: 1 (f=1): [M(1)][92.0%][r=24.6M,w=143M][r=6,w=35 IOPS][eta 00m:02s]Jobs: 1 (f=1): [M(1)][96.0%][r=12.3M,w=102M][r=3,w=25 IOPS][eta 00m:01s]Jobs: 1 (f=1): [M(1)][100.0%][r=16.4M,w=147M][r=4,w=36 IOPS][eta 00m:00s]Jobs: 1 (f=1): [f(1)][100.0%][r=16.4M,w=45.1M][r=4,w=11 IOPS][eta 00m:00s]seqwrite: (groupid=0, jobs=1): err= 0: pid=10542: Tue Oct 23 03:31:36 2018
+   read: IOPS=4, BW=18.4MiB/s (19.3MB/s)(456MiB/24769msec)
+    clat (msec): min=3, max=264, avg=31.19, stdev=46.08
+     lat (msec): min=3, max=264, avg=31.19, stdev=46.08
+    clat percentiles (msec):
+     |  1.00th=[    4],  5.00th=[    4], 10.00th=[    5], 20.00th=[    5],
+     | 30.00th=[    6], 40.00th=[   10], 50.00th=[   16], 60.00th=[   21],
+     | 70.00th=[   26], 80.00th=[   46], 90.00th=[   84], 95.00th=[  129],
+     | 99.00th=[  239], 99.50th=[  266], 99.90th=[  266], 99.95th=[  266],
+     | 99.99th=[  266]
+   bw (  KiB/s): min= 8175, max=40960, per=100.00%, avg=20123.43, stdev=8230.07, samples=46
+   iops        : min=    1, max=   10, avg= 4.87, stdev= 2.06, samples=46
+  write: IOPS=36, BW=147MiB/s (154MB/s)(3640MiB/24769msec)
+    clat (msec): min=14, max=549, avg=23.09, stdev=32.76
+     lat (msec): min=14, max=549, avg=23.30, stdev=32.75
+    clat percentiles (msec):
+     |  1.00th=[   15],  5.00th=[   15], 10.00th=[   15], 20.00th=[   16],
+     | 30.00th=[   16], 40.00th=[   16], 50.00th=[   16], 60.00th=[   17],
+     | 70.00th=[   17], 80.00th=[   18], 90.00th=[   24], 95.00th=[   59],
+     | 99.00th=[  167], 99.50th=[  253], 99.90th=[  550], 99.95th=[  550],
+     | 99.99th=[  550]
+   bw (  KiB/s): min=16384, max=229376, per=100.00%, avg=151129.67, stdev=43734.49, samples=49
+   iops        : min=    4, max=   56, avg=36.86, stdev=10.72, samples=49
+  lat (msec)   : 4=0.98%, 10=3.61%, 20=81.25%, 50=6.35%, 100=4.39%
+  lat (msec)   : 250=2.83%, 500=0.49%, 750=0.10%
+  cpu          : usr=0.88%, sys=1.78%, ctx=1028, majf=0, minf=28
+  IO depths    : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     issued rwt: total=114,910,0, short=0,0,0, dropped=0,0,0
+     latency   : target=0, window=0, percentile=100.00%, depth=1
+
+Run status group 0 (all jobs):
+   READ: bw=18.4MiB/s (19.3MB/s), 18.4MiB/s-18.4MiB/s (19.3MB/s-19.3MB/s), io=456MiB (478MB), run=24769-24769msec
+  WRITE: bw=147MiB/s (154MB/s), 147MiB/s-147MiB/s (154MB/s-154MB/s), io=3640MiB (3817MB), run=24769-24769msec
+
+Disk stats (read/write):
+  sda: ios=1024/8137, merge=0/0, ticks=7573/121556, in_queue=129474, util=98.13%
+<fiotest-51> 
+
+Iteration 1 write total throughtput = 150528
+Iteration 1 read total throughtput = 18841.6
+

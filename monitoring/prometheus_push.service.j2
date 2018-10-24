@@ -1,0 +1,12 @@
+[Unit]
+Description=Prometheus metrics push
+After=node_exporter.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/bash -c 'while true; do /usr/bin/curl -s http://localhost:9100/metrics | /usr/bin/curl --data-binary @- http://{{ prom_server }}:{{ push_gw_port }}/metrics/job/{{ job_name }}/instance/$(hostname -s); sleep 1; done'
+PIDFile=/var/run/prom_push.pid
+ExecStop=/usr/bin/kill -9 `cat /var/run/prom_push.pid`
+
+[Install]
+WantedBy=multi-user.target

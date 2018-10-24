@@ -1,0 +1,100 @@
+- name: Configure DS3 web server instances
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    engine_url: https://rhvm-perf.lab.eng.blr.redhat.com/ovirt-engine/api
+    engine_user: admin@internal
+    engine_password: RedHat1!
+
+    web_vm_tag: ds3-web
+
+  tasks:
+    #- include_vars: credentials/ovirt-credentials.yaml
+
+    - assert:
+        that:
+          - engine_url is defined
+          - engine_user is defined
+          - engine_password is defined
+
+    - ovirt_auth:
+        url: "{{ engine_url }}"
+        username: "{{ engine_user }}"
+        password: "{{ engine_password }}"
+
+    - name: Get Web VMs by tag
+      ovirt_vms_facts:
+        auth: "{{ ovirt_auth }}"
+        pattern: "tag={{ web_vm_tag }} and status = Up"
+        #pattern: "name = ds3-web* and status = Up"
+      register: web_vms
+
+    - debug: 
+        var: web_vms
+
+    - name: Get Web VM NICs
+      ovirt_nics_facts:
+        auth: "{{ ovirt_auth }}"
+        vm: "{{ item }}"
+      register: web_nics
+      loop: "{{ web_vms.ansible_facts.ovirt_vms|json_query('[*].name') }}"
+
+    
+    - set_fact:
+        web_ips: "{{ web_nics.results|json_query('[].ansible_facts.ovirt_nics[].reported_devices[].ips[?version==`v4`].address | []') }}"
+
+    - debug:
+        var: web_ips
+
+    - name: add VMs to inventory
+      add_host:
+        name: "{{ item }}"
+        groups: web_hosts
+        ansible_ssh_user: root
+      with_items: "{{ web_ips }}"
+
+- name: Initialize web hosts
+  hosts: web_hosts
+  gather_facts: true
+  become: true
+
+  vars:
+    web_vm_hostname_prefix: ds3-web-
+    db_vm_hostname_prefix: 10.70.56.
+
+  tasks:
+
+    # sets the mysql default host ds3-mysql-XXX where XXX is the number extracted from the web servers hostname following the pattern ds3-web-NNN where NNN is between 1 and 128
+
+    - name: set mysql default host
+      lineinfile:
+        path: /etc/php.ini
+        #line: mysql.default_host = {{ db_vm_hostname_prefix }}{{ ansible_hostname | regex_replace(web_vm_hostname_prefix + '([0-9]*)', '\1') }}
+        line: mysql.default_host = {{ db_vm_hostname_prefix }}{{ (ansible_hostname | regex_replace(web_vm_hostname_prefix + '([0-9]*)', '\1'))|int + 70  }}
+        regexp: '^mysql.default_host='
+        state: present
+
+    - name: set mysql default user
+      lineinfile:
+        path: /etc/php.ini
+        line: mysql.default_user = ds3_user
+        regexp: '^mysql.default_user='
+        state: present
+
+    - name: set mysql default password
+      lineinfile:
+        path: /etc/php.ini
+        line: mysql.default_password = ds3_password
+        regexp: '^mysql.default_password='
+        state: present
+    
+    - name: enable apache to connect to the db 
+      seboolean:
+        name: httpd_can_network_connect_db
+        state: yes
+        persistent: yes
+
+    - name: restart httpd service
+      service: name=httpd state=restarted enabled=yes
